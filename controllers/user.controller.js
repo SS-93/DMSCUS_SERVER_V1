@@ -63,6 +63,52 @@ const createUser = async (req, res) => {
     }
 };
 
+const signIn = async (req, res) => {
+    try {
+        console.log('🔑 Sign in attempt for email:', req.body.email);
+        
+        const { email, password } = req.body;
+
+        // Find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            console.log('❌ User not found with email:', email);
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Compare password
+        console.log('🔐 Comparing passwords...');
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            console.log('❌ Invalid password for user:', email);
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        // Generate JWT token
+        console.log('🎟️ Generating JWT token');
+        const token = jwt.sign(
+            { userId: user._id, email: user.email },
+            process.env.JWT_SECRET || 'your-secret-key',
+            { expiresIn: '24h' }
+        );
+
+        console.log('✅ Sign in successful for user:', email);
+        res.status(200).json({
+            message: "Sign in successful",
+            user: {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                phoneNumber: user.phoneNumber
+            },
+            token
+        });
+    } catch (error) {
+        console.error('❌ Error during sign in:', error);
+        res.status(500).json({ message: "Error during sign in", error: error.message });
+    }
+};
+
 const getUser = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -111,7 +157,4 @@ const updateUserById = async (req, res) => {
     res.status(200).json(user);
 };
 
-
-
-
-module.exports = { createUser, getUser };
+module.exports = { createUser, signIn };
