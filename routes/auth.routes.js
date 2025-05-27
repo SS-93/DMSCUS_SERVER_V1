@@ -4,6 +4,11 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const { User } = require('../models/user.model');
 
+// Import Google Drive routes
+const driveRoutes = require('./drive.routes');
+
+// Mount Drive routes under /drive
+router.use('/drive', driveRoutes);
 
 router.get('/clock', (req, res) => {
   const oauth2Client = require('../utils/googleAuth');

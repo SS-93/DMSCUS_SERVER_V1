@@ -157,4 +157,23 @@ const updateUserById = async (req, res) => {
     res.status(200).json(user);
 };
 
-module.exports = { createUser, signIn };
+// Get current user profile (for AuthContext)
+const getMe = async (req, res) => {
+    try {
+        // req.user is set by the authenticateToken middleware
+        const user = req.user;
+        res.status(200).json({
+            id: user._id,
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phoneNumber: user.phoneNumber
+        });
+    } catch (error) {
+        console.error('❌ Error getting user profile:', error);
+        res.status(500).json({ message: "Error getting user profile", error: error.message });
+    }
+};
+
+module.exports = { createUser, signIn, getMe };

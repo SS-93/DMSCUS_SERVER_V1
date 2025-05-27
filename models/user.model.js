@@ -10,7 +10,12 @@ const userSchema = new mongoose.Schema({
     password: {type: String, required:true, minlength:8},
     phoneNumber: {type: String, trim:true, required:true},
     googleId: {type: String, unique: true, sparse: true}, // Google OAuth ID
-    picture: {type: String} // Google profile picture URL
+    picture: {type: String}, // Google profile picture URL
+    
+    // Google Drive tokens
+    driveAccessToken: {type: String},
+    driveRefreshToken: {type: String},
+    driveTokenExpiry: {type: Date},
 }, { timestamps: true });
 
 userSchema.pre("save", async function(next){
